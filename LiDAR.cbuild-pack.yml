@@ -1,0 +1,19 @@
+<<<<<<< HEAD
+cbuild-pack:
+  resolved-packs:
+    - resolved-pack: ARM::CMSIS@6.1.0
+      selected-by-pack:
+        - ARM::CMSIS
+    - resolved-pack: TexasInstruments::MSP432E4_DFP@3.2.6
+      selected-by-pack:
+        - TexasInstruments::MSP432E4_DFP
+=======
+cbuild-pack:
+  resolved-packs:
+    - resolved-pack: ARM::CMSIS@6.1.0
+      selected-by-pack:
+        - ARM::CMSIS
+    - resolved-pack: TexasInstruments::MSP432E4_DFP@3.2.6
+      selected-by-pack:
+        - TexasInstruments::MSP432E4_DFP
+>>>>>>> master

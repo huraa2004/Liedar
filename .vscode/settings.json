@@ -1,0 +1,26 @@
+{
+    "clangd.arguments": [
+        "--compile-commands-dir=e:\\Work Software\\VSCode Keil\\LiDAR\\out\\Deliverable 2\\MSP432E401Y\\Debug"
+    ],
+    "files.associations": {
+        "vl53l1x_api.h": "c",
+        "interrupts.h": "c",
+        "ports.h": "c",
+        "vl531x.h": "c",
+        "stdint.h": "c",
+        "onboardleds.h": "c",
+        "tm4c1294ncpdt.h": "c",
+        "motor.h": "c",
+        "i2c.h": "c"
+    },
+    "cmsis-csolution.actions": [
+        {
+            "path": "LiDAR.csolution.yml",
+            "target": "MSP432E401Y",
+            "config": {
+                "run": "Flash Device",
+                "debug": "Arm Debugger"
+            }
+        }
+    ]
+}

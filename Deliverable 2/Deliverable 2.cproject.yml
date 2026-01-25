@@ -1,0 +1,26 @@
+project:
+  groups:
+    - group: Source Files
+      files:
+        - file: src/Interrupts.c
+        - file: src/2dx_studio_8c.c
+        - file: src/Motor.c
+        - file: src/onboardLEDs.c
+        - file: src/PLL.c
+        - file: src/Ports.c
+        - file: src/SysTick.c
+        - file: src/uart.c
+        - file: src/VL531X.c
+        - file: src/VL53L1X_api.c
+        - file: src/vl53l1_platform_2dx4.c
+        - file: src/I2C.c
+
+  add-path:
+    - ./include
+
+  components:
+    - component: ARM::CMSIS:CORE
+    - component: Device:Startup
+  output:
+    type:
+      - elf

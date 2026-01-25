@@ -1,0 +1,259 @@
+cbuild-run:
+  generated-by: csolution version 2.8.0
+  solution: LiDAR.csolution.yml
+  target-type: MSP432E401Y
+  compiler: AC6
+  device: Texas Instruments::MSP432E401Y
+  device-pack: TexasInstruments::MSP432E4_DFP@3.2.6
+  board: TexasInstruments::MSP-EXP432E401Y
+  board-pack: TexasInstruments::MSP432E4_DFP@3.2.6
+  programming:
+    - algorithm: ${CMSIS_PACK_ROOT}/TexasInstruments/MSP432E4_DFP/3.2.6/FlashARM/MSP432E4_MainFlash1024kB.FLM
+      start: 0x00000000
+      size: 0x00100000
+      ram-start: 0x20000000
+      ram-size: 0x0003E000
+      default: true
+  system-descriptions:
+    - file: ${CMSIS_PACK_ROOT}/TexasInstruments/MSP432E4_DFP/3.2.6/SVD/MSP432E401Y.svd
+      type: svd
+  output:
+    - file: out/Deliverable 2/MSP432E401Y/Debug/Deliverable 2.axf
+      info: generate by Deliverable 2.Debug+MSP432E401Y
+      type: elf
+  system-resources:
+    memory:
+      - name: IROM1
+        access: rx
+        start: 0x00000000
+        size: 0x00100000
+        default: true
+        startup: true
+        from-pack: TexasInstruments::MSP432E4_DFP@3.2.6
+      - name: IRAM1
+        access: rwx
+        start: 0x20000000
+        size: 0x00040000
+        default: true
+        from-pack: TexasInstruments::MSP432E4_DFP@3.2.6
+  debugger:
+    - name: <default>
+      port: swd
+      clock: 10000000
+  debug-sequences:
+    - name: DebugDeviceUnlock
+      blocks:
+        - execute: |
+            __var DID0 = 0;
+            __var DID1 = 0;
+            __var isMSP432E401Y = 0;
+            __var isMSP432E411Y = 0;
+            __var isMSP432E4 = 0;
+            DID0 = Read32(0x400FE000);
+            DID1 = Read32(0x400FE004);
+            isMSP432E401Y = 
+            (DID0 == 0x180C0002) &&
+            (DID1 == 0x102DC06E);
+            isMSP432E411Y = 
+            (DID0 == 0x180C0002) &&
+            (DID1 == 0x1032E076);
+
+            isMSP432E4 = isMSP432E401Y || isMSP432E411Y;
+        - if: "!isMSP432E4"
+          execute: |
+            Query(0, "Device is not supported.", 0);
+    - name: TraceStart
+      blocks:
+        - execute: |
+            __var value         = 0;
+            __var clockEnabled  = 0;
+            __var width         = (__traceout & 0x003F0000) >> 16;        // TPIU Port Width
+
+            value = Read32(0x400FE608);
+            Write32(0x400FE608, value | 0x20);      // Enable clock for GPIO port F
+        - while: clockEnabled == 0
+          timeout: 50000
+          execute: |
+            // wait 50 ms to enable clock for GPIO F
+            clockEnabled = (Read32(0x400FE608) & 0x20);
+        - if: width == 1
+          execute: |
+            Write32(0x4005D520, 0x4C4F434B);        // Unlock GPIOLOCK F
+            value = Read32(0x4005D524);
+            Write32(0x4005D524, value | 0x0C);      // Set GPIOCR
+            value = Read32(0x4005D400);
+            Write32(0x4005D400, value | 0x0C);      // Set GPIODIR to output
+            value = Read32(0x4005D51C);
+            Write32(0x4005D51C, value | 0x0C);      // Set GPIODEN
+            value = Read32(0x4005D508);
+            Write32(0x4005D508, value | 0x0C);      // Set GPIODR8R
+            value = Read32(0x4005D510);
+            Write32(0x4005D510, value | 0x0C);      // Set GPIOPUR
+            value = Read32(0x4005D52C);
+            Write32(0x4005D52C, value | 0x0FF00);   // Set GPIOPCTL function to 0xF for trace pins
+            value = Read32(0x4005D420);
+            Write32(0x4005D420, value | 0x0C);      // Set GPIOAFSEL bit for trace pins
+        - if: width == 2
+          execute: |
+            Write32(0x4005D520, 0x4C4F434B);        // Unlock GPIOLOCK F
+            value = Read32(0x4005D524);
+            Write32(0x4005D524, 0x0000000E);        // Set GPIOCR
+            value = Read32(0x4005D400);
+            Write32(0x4005D400, value | 0x0E);      // Set GPIODIR to output
+            value = Read32(0x4005D51C);
+            Write32(0x4005D51C, value | 0x0E);      // Set GPIODEN
+            value = Read32(0x4005D508);
+            Write32(0x4005D508, value | 0x0E);      // Set GPIODR8R
+            value = Read32(0x4005D510);
+            Write32(0x4005D510, value | 0x0E);      // Set GPIOPUR
+            value = Read32(0x4005D52C);
+            Write32(0x4005D52C, value | 0x0FFF0);   // Set GPIOPCTL function to 0xF for trace pins
+            value = Read32(0x4005D420);
+            Write32(0x4005D420, value | 0x0E);      // Set GPIOAFSEL bit for trace pins
+        - if: width == 4
+          execute: |
+            Write32(0x4005D520, 0x4C4F434B);        // Unlock GPIOLOCK F
+            value = Read32(0x4005D524);
+            Write32(0x4005D524, value | 0x1F);      // Set GPIOCR
+            value = Read32(0x4005D400);
+            Write32(0x4005D400, value | 0x1F);      // Set GPIODIR to output
+            value = Read32(0x4005D51C);
+            Write32(0x4005D51C, value | 0x1F);      // Set GPIODEN
+            value = Read32(0x4005D508);
+            Write32(0x4005D508, value | 0x1F);      // Set GPIODR8R      
+            value = Read32(0x4005D510);
+            Write32(0x4005D510, value | 0x1F);      // Set GPIOPUR
+            value = Read32(0x4005D52C);
+            Write32(0x4005D52C, value | 0xFFFFF);    // Set GPIOPCTL function to 0xF for trace pins
+            value = Read32(0x4005D420);
+            Write32(0x4005D420, value | 0x1F);      // Set GPIOAFSEL bit for trace pins
+
+cbuild-run:
+  generated-by: csolution version 2.8.0
+  solution: LiDAR.csolution.yml
+  target-type: MSP432E401Y
+  compiler: AC6
+  device: Texas Instruments::MSP432E401Y
+  device-pack: TexasInstruments::MSP432E4_DFP@3.2.6
+  board: TexasInstruments::MSP-EXP432E401Y
+  board-pack: TexasInstruments::MSP432E4_DFP@3.2.6
+  programming:
+    - algorithm: ${CMSIS_PACK_ROOT}/TexasInstruments/MSP432E4_DFP/3.2.6/FlashARM/MSP432E4_MainFlash1024kB.FLM
+      start: 0x00000000
+      size: 0x00100000
+      ram-start: 0x20000000
+      ram-size: 0x0003E000
+      default: true
+  system-descriptions:
+    - file: ${CMSIS_PACK_ROOT}/TexasInstruments/MSP432E4_DFP/3.2.6/SVD/MSP432E401Y.svd
+      type: svd
+  output:
+    - file: out/Deliverable 2/MSP432E401Y/Debug/Deliverable 2.axf
+      info: generate by Deliverable 2.Debug+MSP432E401Y
+      type: elf
+  system-resources:
+    memory:
+      - name: IROM1
+        access: rx
+        start: 0x00000000
+        size: 0x00100000
+        default: true
+        startup: true
+        from-pack: TexasInstruments::MSP432E4_DFP@3.2.6
+      - name: IRAM1
+        access: rwx
+        start: 0x20000000
+        size: 0x00040000
+        default: true
+        from-pack: TexasInstruments::MSP432E4_DFP@3.2.6
+  debugger:
+    - name: <default>
+      port: swd
+      clock: 10000000
+  debug-sequences:
+    - name: DebugDeviceUnlock
+      blocks:
+        - execute: |
+            __var DID0 = 0;
+            __var DID1 = 0;
+            __var isMSP432E401Y = 0;
+            __var isMSP432E411Y = 0;
+            __var isMSP432E4 = 0;
+            DID0 = Read32(0x400FE000);
+            DID1 = Read32(0x400FE004);
+            isMSP432E401Y = 
+            (DID0 == 0x180C0002) &&
+            (DID1 == 0x102DC06E);
+            isMSP432E411Y = 
+            (DID0 == 0x180C0002) &&
+            (DID1 == 0x1032E076);
+
+            isMSP432E4 = isMSP432E401Y || isMSP432E411Y;
+        - if: "!isMSP432E4"
+          execute: |
+            Query(0, "Device is not supported.", 0);
+    - name: TraceStart
+      blocks:
+        - execute: |
+            __var value         = 0;
+            __var clockEnabled  = 0;
+            __var width         = (__traceout & 0x003F0000) >> 16;        // TPIU Port Width
+
+            value = Read32(0x400FE608);
+            Write32(0x400FE608, value | 0x20);      // Enable clock for GPIO port F
+        - while: clockEnabled == 0
+          timeout: 50000
+          execute: |
+            // wait 50 ms to enable clock for GPIO F
+            clockEnabled = (Read32(0x400FE608) & 0x20);
+        - if: width == 1
+          execute: |
+            Write32(0x4005D520, 0x4C4F434B);        // Unlock GPIOLOCK F
+            value = Read32(0x4005D524);
+            Write32(0x4005D524, value | 0x0C);      // Set GPIOCR
+            value = Read32(0x4005D400);
+            Write32(0x4005D400, value | 0x0C);      // Set GPIODIR to output
+            value = Read32(0x4005D51C);
+            Write32(0x4005D51C, value | 0x0C);      // Set GPIODEN
+            value = Read32(0x4005D508);
+            Write32(0x4005D508, value | 0x0C);      // Set GPIODR8R
+            value = Read32(0x4005D510);
+            Write32(0x4005D510, value | 0x0C);      // Set GPIOPUR
+            value = Read32(0x4005D52C);
+            Write32(0x4005D52C, value | 0x0FF00);   // Set GPIOPCTL function to 0xF for trace pins
+            value = Read32(0x4005D420);
+            Write32(0x4005D420, value | 0x0C);      // Set GPIOAFSEL bit for trace pins
+        - if: width == 2
+          execute: |
+            Write32(0x4005D520, 0x4C4F434B);        // Unlock GPIOLOCK F
+            value = Read32(0x4005D524);
+            Write32(0x4005D524, 0x0000000E);        // Set GPIOCR
+            value = Read32(0x4005D400);
+            Write32(0x4005D400, value | 0x0E);      // Set GPIODIR to output
+            value = Read32(0x4005D51C);
+            Write32(0x4005D51C, value | 0x0E);      // Set GPIODEN
+            value = Read32(0x4005D508);
+            Write32(0x4005D508, value | 0x0E);      // Set GPIODR8R
+            value = Read32(0x4005D510);
+            Write32(0x4005D510, value | 0x0E);      // Set GPIOPUR
+            value = Read32(0x4005D52C);
+            Write32(0x4005D52C, value | 0x0FFF0);   // Set GPIOPCTL function to 0xF for trace pins
+            value = Read32(0x4005D420);
+            Write32(0x4005D420, value | 0x0E);      // Set GPIOAFSEL bit for trace pins
+        - if: width == 4
+          execute: |
+            Write32(0x4005D520, 0x4C4F434B);        // Unlock GPIOLOCK F
+            value = Read32(0x4005D524);
+            Write32(0x4005D524, value | 0x1F);      // Set GPIOCR
+            value = Read32(0x4005D400);
+            Write32(0x4005D400, value | 0x1F);      // Set GPIODIR to output
+            value = Read32(0x4005D51C);
+            Write32(0x4005D51C, value | 0x1F);      // Set GPIODEN
+            value = Read32(0x4005D508);
+            Write32(0x4005D508, value | 0x1F);      // Set GPIODR8R      
+            value = Read32(0x4005D510);
+            Write32(0x4005D510, value | 0x1F);      // Set GPIOPUR
+            value = Read32(0x4005D52C);
+            Write32(0x4005D52C, value | 0xFFFFF);    // Set GPIOPCTL function to 0xF for trace pins
+            value = Read32(0x4005D420);
+            Write32(0x4005D420, value | 0x1F);      // Set GPIOAFSEL bit for trace pins
